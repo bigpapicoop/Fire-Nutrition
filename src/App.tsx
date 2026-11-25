@@ -96,7 +96,7 @@ function App() {
     page = (
       <>
         <section className="intro">
-          <h1>Eat well, fuel the fire.</h1>
+          <h1>Cook smart. Train hard.</h1>
           <p>
             {allRecipes.length} macro-friendly recipes with servings you can scale. Save your favorites or add your
             own.
