@@ -203,7 +203,7 @@ function App() {
           <img src="logo-mark.png" alt="" className="brand__logo" width="26" height="32" />
           <span className="brand__text">
             <span>Fire Nutrition</span>
-            <span className="brand__by">Built by Travis Cooper</span>
+            <span className="brand__by">By Travis Cooper</span>
           </span>
         </a>
         <div className="topbar__actions">
