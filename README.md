@@ -42,6 +42,13 @@ then open the recipe and tap **Delete**.
 New sign-ups are turned off, so the admin account is the only account. Forgot the password?
 Supabase → Authentication → Users → your account → **Send password recovery**, or set a new one there.
 
+## New-visitor notifications
+
+The first time a new device opens the app, it sends one anonymous signal (device type only, no personal data),
+and you get a push notification through the free **ntfy** app. You also get one when a community recipe is added.
+People who used the app before this feature, and your own signed-in admin devices, are never counted.
+Setup lives in `supabase/activity.sql`; the ntfy channel name is stored only in the database, not in this code.
+
 ## How phones get updates
 
 The app checks for a new version when it opens, when you switch back to it, and every 5 minutes while it's open.

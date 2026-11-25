@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import { STARTER_RECIPES } from './data/recipes'
 import { CATEGORIES } from './types'
@@ -12,6 +12,7 @@ import { UpdateBanner } from './components/UpdateBanner'
 import { CalculatorPage } from './components/CalculatorPage'
 import { AdminPage } from './components/AdminPage'
 import { sharedEnabled, useAdmin, useSharedRecipes } from './shared/db'
+import { markOwnerDevice } from './shared/newVisitor'
 
 type Filter = 'All' | 'Favorites' | Category
 type Sort = 'name' | 'protein' | 'calories' | 'time'
@@ -32,6 +33,9 @@ function App() {
   const [sort, setSort] = useState<Sort>('name')
   const shared = useSharedRecipes()
   const { session, isAdmin } = useAdmin()
+  useEffect(() => {
+    if (isAdmin) markOwnerDevice()
+  }, [isAdmin])
 
   const allRecipes = useMemo(
     () => [...STARTER_RECIPES, ...shared.recipes, ...customRecipes],
