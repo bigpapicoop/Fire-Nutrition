@@ -37,9 +37,6 @@ export function RecipeDetail({ recipe, favorite, onToggleFavorite, onDelete }: P
           ← All recipes
         </a>
         <div className="detail__actions">
-          <button type="button" className="btn btn--ghost" onClick={() => window.print()}>
-            Print
-          </button>
           {onDelete && (
             <button type="button" className="btn btn--danger" onClick={onDelete}>
               Delete
@@ -51,7 +48,7 @@ export function RecipeDetail({ recipe, favorite, onToggleFavorite, onDelete }: P
             aria-pressed={favorite}
             onClick={onToggleFavorite}
           >
-            {favorite ? '♥ Saved' : '♡ Save'}
+            {favorite ? '♥ Added to favorites' : '♡ Add to favorites'}
           </button>
         </div>
       </div>
