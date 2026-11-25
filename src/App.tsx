@@ -126,10 +126,6 @@ function App() {
       <>
         <section className="intro">
           <h1>Cook smart. Train hard.</h1>
-          <p>
-            {allRecipes.length} macro-friendly recipes with servings you can scale. Save your favorites or add your
-            own.
-          </p>
           <a href="#/calculator" className="btn btn--ghost intro__calc">
             🧮 Nutrition calculator
           </a>
