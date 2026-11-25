@@ -28,6 +28,8 @@ export interface Recipe {
   tags: string[]
   ingredients: Ingredient[]
   steps: string[]
-  /** True for recipes the user added themselves (they can be deleted). */
+  /** True for recipes saved only on this device (their owner can delete them). */
   custom?: boolean
+  /** True for recipes from the shared database that everyone sees (only admins can delete). */
+  shared?: boolean
 }

@@ -821,3 +821,24 @@ code {
     grid-template-columns: 1fr 1.5fr;
   }
 }
+
+/* ---------- Shared recipes & admin ---------- */
+.card__community {
+  color: var(--muted);
+  font-weight: 600;
+}
+.admin-form {
+  display: grid;
+  gap: 16px;
+}
+.admin-ok {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #1f9d55 14%, transparent);
+  color: var(--text);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

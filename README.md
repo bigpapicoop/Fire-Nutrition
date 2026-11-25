@@ -30,6 +30,18 @@ live in about a minute. Add a note if you like: `npm run ship -- "Added turkey c
 Watch each publish at https://github.com/bigpapicoop/Fire-Nutrition/actions (green check = live, red X = failed;
 the live app stays on the last good version if one fails). The automation is in `.github/workflows/deploy.yml`.
 
+## Community recipes and admin
+
+Recipes people add are shared with everyone (labelled **Community**) and stored in a free Supabase database
+(project "Fire Nutrition" at https://supabase.com/dashboard). Anyone can add one, nobody can edit one,
+and only the admin can delete one. The database enforces these rules itself (see `supabase/setup.sql`).
+
+**To delete a recipe:** tap **Admin** at the bottom of the app, sign in with your admin email and password,
+then open the recipe and tap **Delete**.
+
+New sign-ups are turned off, so the admin account is the only account. Forgot the password?
+Supabase → Authentication → Users → your account → **Send password recovery**, or set a new one there.
+
 ## How phones get updates
 
 The app checks for a new version when it opens, when you switch back to it, and every 5 minutes while it's open.
@@ -44,8 +56,8 @@ Open the live link on the phone, then:
 
 Open the app once while you're online. After that it works without internet.
 
-The code is public on GitHub, and anyone with the link can open the app. Recipes you add and your favorites
-are not uploaded: they stay on each device.
+The code is public on GitHub, and anyone with the link can open the app. Recipes people add are shared with
+everyone; favorites stay on each device.
 
 ## Where things live
 
@@ -54,6 +66,8 @@ are not uploaded: they stay on each device.
 - `src/components/`: recipe card, recipe page, add-recipe form, calculator, install and update bars
 - `public/manifest.webmanifest`: app name, colors and icons for the home screen
 - `public/sw.js`: offline support
+- `src/shared/`: connection to the shared recipe database (`config.ts`) and loading/adding/deleting (`db.ts`)
+- `supabase/setup.sql`: the database table and security rules
 - `scripts/ship.mjs`: what `npm run ship` does
 - `.github/workflows/deploy.yml`: how GitHub builds and publishes the app
 - `netlify.toml`: settings for Netlify, if you ever host it there instead

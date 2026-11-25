@@ -7,7 +7,10 @@ import { calculateNutrition, roundMacros } from '../nutrition/calc'
 import { NutritionCalculator } from './NutritionCalculator'
 
 interface Props {
-  onSave: (recipe: Omit<Recipe, 'id'>) => void
+  /** Save the recipe. May be async (shared recipes go to the database); throw to show an error. */
+  onSave: (recipe: Omit<Recipe, 'id'>) => void | Promise<void>
+  /** True when recipes are shared with everyone (changes the button label and adds a note). */
+  shared?: boolean
   onCancel: () => void
 }
 
@@ -19,7 +22,8 @@ const toLines = (s: string) =>
     .map((l) => l.trim())
     .filter(Boolean)
 
-export function RecipeForm({ onSave, onCancel }: Props) {
+export function RecipeForm({ onSave, onCancel, shared }: Props) {
+  const [saving, setSaving] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState<Category>('Dinner')
@@ -61,8 +65,9 @@ export function RecipeForm({ onSave, onCancel }: Props) {
     setAutoNutrition(false)
   }
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
+    if (saving) return
     const stepLines = toLines(steps)
     if (!title.trim()) return setError('Give the recipe a name.')
     if (ingredientLines.length === 0) return setError('Add at least one ingredient.')
@@ -70,7 +75,10 @@ export function RecipeForm({ onSave, onCancel }: Props) {
     if (autoNutrition && calc.counted === 0)
       return setError('None of the ingredients could be counted. Fix them in the breakdown, or enter nutrition by hand.')
 
-    onSave({
+    setError('')
+    setSaving(true)
+    try {
+      await onSave({
       title: title.trim(),
       description: description.trim(),
       category,
@@ -87,8 +95,11 @@ export function RecipeForm({ onSave, onCancel }: Props) {
         .filter(Boolean),
       ingredients: ingredientLines.map(parseIngredient),
       steps: stepLines,
-      custom: true,
-    })
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't save the recipe. Please try again.")
+      setSaving(false)
+    }
   }
 
   return (
@@ -231,6 +242,12 @@ export function RecipeForm({ onSave, onCancel }: Props) {
         <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="high-protein, meal-prep" />
       </label>
 
+      {shared && (
+        <p className="muted small" style={{ margin: 0 }}>
+          Shared recipes are visible to everyone who uses Fire Nutrition and can't be edited after posting.
+        </p>
+      )}
+
       {error && (
         <p className="error" role="alert">
           {error}
@@ -241,8 +258,8 @@ export function RecipeForm({ onSave, onCancel }: Props) {
         <button type="button" className="btn btn--ghost" onClick={onCancel}>
           Cancel
         </button>
-        <button type="submit" className="btn btn--primary">
-          Save recipe
+        <button type="submit" className="btn btn--primary" disabled={saving}>
+          {saving ? 'Saving…' : shared ? 'Share recipe' : 'Save recipe'}
         </button>
       </div>
     </form>

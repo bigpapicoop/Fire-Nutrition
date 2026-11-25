@@ -10,6 +10,8 @@ import { RecipeForm } from './components/RecipeForm'
 import { InstallPrompt } from './components/InstallPrompt'
 import { UpdateBanner } from './components/UpdateBanner'
 import { CalculatorPage } from './components/CalculatorPage'
+import { AdminPage } from './components/AdminPage'
+import { sharedEnabled, useAdmin, useSharedRecipes } from './shared/db'
 
 type Filter = 'All' | 'Favorites' | Category
 type Sort = 'name' | 'protein' | 'calories' | 'time'
@@ -28,8 +30,13 @@ function App() {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<Filter>('All')
   const [sort, setSort] = useState<Sort>('name')
+  const shared = useSharedRecipes()
+  const { session, isAdmin } = useAdmin()
 
-  const allRecipes = useMemo(() => [...STARTER_RECIPES, ...customRecipes], [customRecipes])
+  const allRecipes = useMemo(
+    () => [...STARTER_RECIPES, ...shared.recipes, ...customRecipes],
+    [shared.recipes, customRecipes],
+  )
   const favSet = useMemo(() => new Set(favorites), [favorites])
 
   const toggleFavorite = (id: string) =>
@@ -54,20 +61,40 @@ function App() {
       .sort(SORTS[sort].fn)
   }, [allRecipes, favSet, filter, query, sort])
 
-  const addRecipe = (draft: Omit<Recipe, 'id'>) => {
+  const addRecipe = async (draft: Omit<Recipe, 'id'>) => {
+    if (sharedEnabled) {
+      // Shared with everyone through the database. Throws (shown in the form) if it can't save.
+      const id = await shared.add(draft)
+      navigate(`/recipe/${id}`)
+      return
+    }
     const base = slugify(draft.title)
     let id = base
     for (let n = 2; allRecipes.some((r) => r.id === id); n++) id = `${base}-${n}`
-    setCustomRecipes((list) => [...list, { ...draft, id }])
+    setCustomRecipes((list) => [...list, { ...draft, id, custom: true }])
     navigate(`/recipe/${id}`)
   }
 
-  const deleteRecipe = (id: string) => {
-    if (!window.confirm('Delete this recipe? This cannot be undone.')) return
-    setCustomRecipes((list) => list.filter((r) => r.id !== id))
-    setFavorites((f) => f.filter((x) => x !== id))
+  const deleteRecipe = async (recipe: Recipe) => {
+    const question = recipe.shared
+      ? `Delete "${recipe.title}" for everyone? This cannot be undone.`
+      : 'Delete this recipe? This cannot be undone.'
+    if (!window.confirm(question)) return
+    if (recipe.shared) {
+      try {
+        await shared.remove(recipe.id)
+      } catch (err) {
+        window.alert(err instanceof Error ? err.message : "Couldn't delete it.")
+        return
+      }
+    } else {
+      setCustomRecipes((list) => list.filter((r) => r.id !== recipe.id))
+    }
+    setFavorites((f) => f.filter((x) => x !== recipe.id))
     navigate('/')
   }
+
+  const canDelete = (r: Recipe) => Boolean(r.custom || (r.shared && isAdmin))
 
   let page
   const detailMatch = route.match(/^\/recipe\/(.+)$/)
@@ -79,7 +106,7 @@ function App() {
         recipe={recipe}
         favorite={favSet.has(recipe.id)}
         onToggleFavorite={() => toggleFavorite(recipe.id)}
-        onDelete={recipe.custom ? () => deleteRecipe(recipe.id) : undefined}
+        onDelete={canDelete(recipe) ? () => deleteRecipe(recipe) : undefined}
       />
     ) : (
       <div className="empty">
@@ -88,7 +115,9 @@ function App() {
       </div>
     )
   } else if (route === '/new') {
-    page = <RecipeForm onSave={addRecipe} onCancel={() => navigate('/')} />
+    page = <RecipeForm onSave={addRecipe} onCancel={() => navigate('/')} shared={sharedEnabled} />
+  } else if (route === '/admin') {
+    page = <AdminPage session={session} isAdmin={isAdmin} />
   } else if (route === '/calculator') {
     page = <CalculatorPage />
   } else {
@@ -184,7 +213,15 @@ function App() {
       </header>
       <UpdateBanner />
       <main>{page}</main>
-      <footer className="footer no-print">Nutrition values are estimates per serving.</footer>
+      <footer className="footer no-print">
+        Nutrition values are estimates per serving.
+        {sharedEnabled && (
+          <>
+            {' '}
+            · <a href="#/admin">{isAdmin ? 'Admin (signed in)' : 'Admin'}</a>
+          </>
+        )}
+      </footer>
     </div>
   )
 }

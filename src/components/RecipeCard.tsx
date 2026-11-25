@@ -15,7 +15,10 @@ export function RecipeCard({ recipe, favorite, onToggleFavorite }: Props) {
           {recipe.emoji}
         </div>
         <div className="card__body">
-          <span className="card__category">{recipe.category}</span>
+          <span className="card__category">
+            {recipe.category}
+            {recipe.shared && <span className="card__community"> · Community</span>}
+          </span>
           <h3 className="card__title">{recipe.title}</h3>
           <p className="card__desc">{recipe.description}</p>
           <div className="card__meta">
