@@ -66,6 +66,17 @@
   margin-bottom: 20px;
   font-weight: 600;
 }
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.brand__by {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
 .brand__logo {
   height: 32px;
   width: auto;
