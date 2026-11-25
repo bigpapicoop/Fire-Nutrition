@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "ship": "git add -A && git commit -m \"Update app\" && git push",
+    "ship": "node scripts/ship.mjs",
     "icons": "node scripts/make-icons.mjs"
   },
   "dependencies": {

@@ -25,3 +25,6 @@ dist-ssr
 
 # Local Claude settings
 .claude/
+
+# Local Netlify folder
+.netlify
