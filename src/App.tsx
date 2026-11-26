@@ -11,6 +11,7 @@ import { InstallPrompt } from './components/InstallPrompt'
 import { UpdateBanner } from './components/UpdateBanner'
 import { CalculatorPage } from './components/CalculatorPage'
 import { AdminPage } from './components/AdminPage'
+import { MealSpinner } from './components/MealSpinner'
 import { sharedEnabled, useAdmin, useSharedRecipes } from './shared/db'
 import { markOwnerDevice } from './shared/newVisitor'
 
@@ -134,6 +135,8 @@ function App() {
             🧮 Nutrition calculator
           </a>
         </section>
+
+        <MealSpinner recipes={allRecipes} />
 
         <div className="toolbar">
           <input
